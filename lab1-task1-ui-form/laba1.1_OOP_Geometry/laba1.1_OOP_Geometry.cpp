@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <stdexcept>
 using namespace std;
 
 
@@ -89,7 +90,7 @@ private:
     int width_;
     int height_;
 public:
-    Rect(const Point2D & topleft, int width, int height) : topleft_(topleft), width_(width), height_(height) { if (width <= 0 || height <= 0) throw "height and width must be > 0 "; }
+    Rect(const Point2D & topleft, int width, int height) : topleft_(topleft), width_(width), height_(height) { if (width <= 0 || height <= 0) throw invalid_argument("height and width must be > 0"); }
     Point2D topleft() const { return topleft_; }
     int width() const { return width_; }
     int height() const { return height_; }
@@ -200,6 +201,11 @@ private:
         }
         else return false;
     }
+    void putChar(vector<string>& canvas, int x, int y, char symbol) const {
+        if (y >= 0 && y < (int)canvas.size() && x >= 0 && x < (int)canvas[y].size()) {
+            canvas[y][x] = symbol;
+        }
+    }
 public:
     Form() : focused_(-1) {}
 
@@ -281,12 +287,6 @@ public:
         }
         return elements_[index]->toString();
     }
-    void putChar(vector<string>& canvas, int x, int y, char symbol) const {
-        if (y >= 0 && y < (int)canvas.size() && x >= 0 && x < (int)canvas[y].size()) {
-            canvas[y][x] = symbol;
-        }
-    }
-
     void draw(int width, int height) const {
         vector<string> canvas(height, string(width, ' '));
 
@@ -372,7 +372,7 @@ int main()
     try {
         Rect bad(Point2D(0, 0), 0, 5);
     }
-    catch (const char*) {
+    catch (const invalid_argument&) {
         thrown = true;
     }
     test.check(thrown, "Rect with zero width is rejected");
